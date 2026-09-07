@@ -1,64 +1,20 @@
-# High-Integrity-Roadmap
-Inspired my SVPGs Marty Cagan, a roadmap with evidence backed bets that reduce uncertainity around delivery
+# Marty Cagan — Roadmaps as Credible Commitments After Discovery
 
-#                      Cagan's position        Implication for
-roadmapping
+## Philosophy Highlight
 
-1. Outcomes over      Product teams should be Roadmaps should not
-outputs               given problems/outcomes become feature
-to achieve rather than  contracts imposed on
-lists of features to    teams.
-build.
+| Philosophy highlight | Cagan's position | Implication for roadmapping |
+| --- | --- | --- |
+| **1. Outcomes over outputs** | Product teams should be given problems/outcomes to achieve rather than lists of features to build. | Roadmaps should not become feature contracts imposed on teams. |
+| **2. Discovery precedes commitment** | Teams need to address value, usability, feasibility and viability risks before committing to uncertain solutions. | A solution should not become a roadmap promise simply because someone requested or prioritized it. |
+| **3. Uncertainty should be reduced before others depend on you** | Product work is inherently uncertain, but consequential uncertainty can be reduced through discovery. | Greater stakeholder dependency requires greater confidence. |
+| **4. Commitment has organizational consequences** | A roadmap promise causes Sales, Marketing, Engineering, customers and others to make their own plans. | Premature commitment creates downstream coordination costs. |
+| **5. High-integrity commitments, not certainty** | Product cannot eliminate uncertainty, but it can gather enough evidence to responsibly stand behind a commitment. | Roadmap confidence should reflect evidence rather than executive pressure. |
+| **6. Evidence should match risk** | Different bets carry different levels of uncertainty and consequence. | High-risk work deserves more discovery before commitment than routine work. |
+| **7. Empowered teams discover solutions** | Teams closest to the problem should combine product, design and engineering knowledge to determine solutions. | Roadmap shouldn't prematurely remove solution authority from the team. |
+| **8. Predictability is legitimate when genuinely needed** | Customers, partners and dependent teams sometimes need dates and commitments. | The answer isn't "never use dates"; it is **earn the ability to make the date**. |
+| **9. Artifacts aren't substitutes for shared knowledge** | PRDs, stories and prototypes are useful, but collaboration and discovery create the real understanding. | Roadmap/document completion shouldn't be confused with product understanding. |
+| **10. Roadmap follows knowledge, not aspiration** | Roadmaps become valuable once enough is understood to communicate credible future commitments. | **Don't use the roadmap to manufacture certainty that discovery hasn't produced.** |
 
-2. Discovery precedes Teams need to address   A solution should not
-commitment            value, usability,       become a roadmap
-feasibility and         promise simply because
-viability risks before  someone requested or
-committing to uncertain prioritized it.
-solutions.
+## Philosophical Center
 
-3. Uncertainty should Product work is         Greater stakeholder
-be reduced before       inherently uncertain,   dependency requires
-others depend on you  but consequential       greater confidence.
-uncertainty can be
-reduced through
-discovery.
-
-4. Commitment has     A roadmap promise       Premature commitment
-organizational          causes Sales,           creates downstream
-consequences          Marketing, Engineering, coordination costs.
-customers and others to
-make their own plans.
-
-5. High-integrity     Product cannot          Roadmap confidence
-commitments, not        eliminate uncertainty,  should reflect evidence
-certainty             but it can gather       rather than executive
-enough evidence to      pressure.
-responsibly stand
-behind a commitment.
-
-6. Evidence should    Different bets carry    High-risk work deserves
-match risk            different levels of     more discovery before
-uncertainty and         commitment than routine
-consequence.            work.
-
-7. Empowered teams    Teams closest to the    Roadmap shouldn't
-discover solutions    problem should combine  prematurely remove
-product, design and     solution authority from
-engineering knowledge   the team.
-to determine solutions.
-
-8. Predictability is  Customers, partners and The answer isn't "never
-legitimate when         dependent teams         use dates"; it is
-genuinely needed      sometimes need dates    earn the ability to
-and commitments.        make the date.
-
-9. Artifacts aren't   PRDs, stories and       Roadmap/document
-substitutes for shared  prototypes are useful,  completion shouldn't be
-knowledge             but collaboration and   confused with product
-discovery create the    understanding.
-real understanding.
-
-Philosophical Center
-
-Earn commitment through discovery.
+> **Earn commitment through discovery.**
