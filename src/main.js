@@ -6,7 +6,7 @@ const riskKeys = ['value','usability','feasibility','viability'];
 
 const seed = [
   {
-    id: crypto.randomUUID(), horizon:'now', status:'active',
+    id: crypto.randomUUID(), isSample:true, horizon:'now', status:'active',
     outcome:'Reduce enterprise onboarding time', why:'Onboarding duration is constraining activation and expansion.',
     metric:'Median onboarding days', baseline:'21', target:'10', owner:'Activation Team',
     opportunities:'Migration friction; admin configuration complexity',
@@ -21,14 +21,14 @@ const seed = [
     }, history:[{date:new Date().toISOString().slice(0,10), note:'Seeded as current evidence-backed solution bet.'}]
   },
   {
-    id: crypto.randomUUID(), horizon:'next', status:'active',
+    id: crypto.randomUUID(), isSample:true, horizon:'next', status:'active',
     outcome:'Improve first-90-day activation', why:'A meaningful segment of new accounts fails to reach repeat product use.',
     metric:'90-day activation rate', baseline:'', target:'', owner:'Growth Product Team',
     opportunities:'Setup confusion; admin education; integration friction', solution:'', window:'Next', dependencies:'', scope:'', residual:'Solution intentionally not committed.',
     problemEvidence:'Usage analysis plus early customer interviews.', risks:blankRisks(), history:[]
   },
   {
-    id: crypto.randomUUID(), horizon:'later', status:'active',
+    id: crypto.randomUUID(), isSample:true, horizon:'later', status:'active',
     outcome:'Increase enterprise self-service', why:'Service-intensive growth will not scale with the enterprise customer base.',
     metric:'', baseline:'', target:'', owner:'', opportunities:'', solution:'', window:'Later', dependencies:'', scope:'', residual:'High uncertainty is expected at this horizon.',
     problemEvidence:'Strategic signal from service load and growth plans.', risks:blankRisks(), history:[]
@@ -36,7 +36,7 @@ const seed = [
 ];
 
 function blankRisks(){ return Object.fromEntries(riskKeys.map(k=>[k,{status:'Moderate',text:'',links:'',files:[]}])) }
-function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || seed; } catch { return seed; } }
+function load(){ try { const saved=localStorage.getItem(STORAGE_KEY); return saved ? JSON.parse(saved) : seed; } catch { return seed; } }
 let bets = load();
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(bets)); }
 function esc(s=''){ return String(s).replace(/[&<>'"]/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[c])); }
@@ -57,7 +57,7 @@ app.innerHTML = `
       <button class="btn primary" id="globalAdd">+ Add roadmap bet</button>
     </div>
   </div>
-  <p class="status-note">Data is saved in this browser. Export JSON before switching devices or browsers.</p>
+  <div class="status-row"><p class="status-note">Data is saved in this browser. Export JSON before switching devices or browsers.</p><div id="sampleNotice"></div></div>
   <div id="roadmap"></div>
   <footer>MVP persistence uses localStorage. Attachments are stored as filenames/metadata only; connect object storage later for real file persistence.</footer>
 </div>
@@ -75,6 +75,27 @@ function renderRoadmap(){
   document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>openEditor(null,b.dataset.add)));
   document.querySelectorAll('[data-inspect]').forEach(b=>b.addEventListener('click',()=>openInspect(b.dataset.inspect)));
   document.querySelectorAll('[data-history]').forEach(b=>b.addEventListener('click',()=>openInspect(b.dataset.history)));
+  document.querySelectorAll('[data-remove-sample]').forEach(b=>b.addEventListener('click',()=>removeSample(b.dataset.removeSample)));
+  renderSampleNotice();
+}
+
+function renderSampleNotice(){
+  const sampleCount=bets.filter(b=>b.isSample===true).length;
+  document.querySelector('#sampleNotice').innerHTML=sampleCount ? `<div class="sample-notice"><span>Showing ${sampleCount} sample bet${sampleCount===1?'':'s'} to demonstrate Now / Next / Later.</span><button class="btn" id="removeSamples">Remove sample bets</button></div>` : '';
+  const removeButton=document.querySelector('#removeSamples');
+  if(removeButton) removeButton.onclick=removeAllSamples;
+}
+
+function removeSample(id){
+  bets=bets.filter(b=>!(b.id===id && b.isSample===true));
+  save();
+  renderRoadmap();
+}
+
+function removeAllSamples(){
+  bets=bets.filter(b=>b.isSample!==true);
+  save();
+  renderRoadmap();
 }
 
 function renderHistory(items){
@@ -92,10 +113,12 @@ function renderHorizon(key,title,sub,detail){
 }
 
 function renderCard(b){
-  const common = `<h3>${esc(b.outcome)}</h3><div class="meta">${esc(b.owner || 'Owner TBD')} · ${esc(b.window || b.horizon.toUpperCase())}</div>`;
-  if(b.horizon==='later') return `<article class="bet-card">${common}<div class="metric"><strong>Why it matters</strong><br>${esc(b.why)}</div><div class="meta">Solution intentionally not required.</div><div class="card-actions"><button class="btn" data-inspect="${b.id}">Inspect</button></div></article>`;
-  if(b.horizon==='next') return `<article class="bet-card">${common}<div class="metric"><strong>Problem evidence</strong><br>${esc(b.problemEvidence || 'Not yet recorded')}</div>${b.opportunities?`<div class="solution"><strong>Known opportunities</strong><br>${esc(b.opportunities)}</div>`:''}${b.solution?`<div class="solution"><strong>Solution hypothesis</strong><br>${esc(b.solution)}</div>`:'<div class="meta">No committed solution.</div>'}<div class="card-actions"><button class="btn" data-inspect="${b.id}">Inspect</button></div></article>`;
-  return `<article class="bet-card">${common}${b.metric?`<div class="metric"><strong>${esc(b.metric)}</strong>${b.baseline||b.target?` · ${esc(b.baseline||'?')} → ${esc(b.target||'?')}`:''}</div>`:''}<div class="solution"><strong>Current solution bet</strong><br>${esc(b.solution || 'Missing')}</div><div class="risk-row">${riskChip('Value',b.risks.value)}${riskChip('Usability',b.risks.usability)}${riskChip('Feasibility',b.risks.feasibility)}${riskChip('Viability',b.risks.viability)}</div><div class="card-actions"><button class="btn" data-inspect="${b.id}">Inspect evidence</button></div></article>`;
+  const sample = b.isSample===true ? '<div class="sample-label">SAMPLE</div><div class="sample-copy">Example Now bet<br><span>This is example data to show how a Now bet works.</span></div>' : '';
+  const remove = b.isSample===true ? `<button class="btn" data-remove-sample="${b.id}">Remove sample</button>` : '';
+  const common = `${sample}<h3>${esc(b.outcome)}</h3><div class="meta">${esc(b.owner || 'Owner TBD')} · ${esc(b.window || b.horizon.toUpperCase())}</div>`;
+  if(b.horizon==='later') return `<article class="bet-card${b.isSample===true?' sample-card':''}">${common}<div class="metric"><strong>Why it matters</strong><br>${esc(b.why)}</div><div class="meta">Solution intentionally not required.</div><div class="card-actions"><button class="btn" data-inspect="${b.id}">Inspect</button>${remove}</div></article>`;
+  if(b.horizon==='next') return `<article class="bet-card${b.isSample===true?' sample-card':''}">${common}<div class="metric"><strong>Problem evidence</strong><br>${esc(b.problemEvidence || 'Not yet recorded')}</div>${b.opportunities?`<div class="solution"><strong>Known opportunities</strong><br>${esc(b.opportunities)}</div>`:''}${b.solution?`<div class="solution"><strong>Solution hypothesis</strong><br>${esc(b.solution)}</div>`:'<div class="meta">No committed solution.</div>'}<div class="card-actions"><button class="btn" data-inspect="${b.id}">Inspect</button>${remove}</div></article>`;
+  return `<article class="bet-card${b.isSample===true?' sample-card':''}">${common}${b.metric?`<div class="metric"><strong>${esc(b.metric)}</strong>${b.baseline||b.target?` · ${esc(b.baseline||'?')} → ${esc(b.target||'?')}`:''}</div>`:''}<div class="solution"><strong>Current solution bet</strong><br>${esc(b.solution || 'Missing')}</div><div class="risk-row">${riskChip('Value',b.risks.value)}${riskChip('Usability',b.risks.usability)}${riskChip('Feasibility',b.risks.feasibility)}${riskChip('Viability',b.risks.viability)}</div><div class="card-actions"><button class="btn" data-inspect="${b.id}">Inspect evidence</button>${remove}</div></article>`;
 }
 
 function requiredFor(h,b){
@@ -116,7 +139,7 @@ function requiredFor(h,b){
 
 function openEditor(id=null,horizon='later'){
   const existing = id ? bets.find(b=>b.id===id) : null;
-  const b = existing ? structuredClone(existing) : {id:crypto.randomUUID(),horizon,status:'active',outcome:'',why:'',metric:'',baseline:'',target:'',owner:'',opportunities:'',solution:'',window:horizon==='now'?'Current':'',dependencies:'',scope:'',residual:'',problemEvidence:'',risks:blankRisks(),history:[]};
+  const b = existing ? structuredClone(existing) : {id:crypto.randomUUID(),isSample:false,horizon,status:'active',outcome:'',why:'',metric:'',baseline:'',target:'',owner:'',opportunities:'',solution:'',window:horizon==='now'?'Current':'',dependencies:'',scope:'',residual:'',problemEvidence:'',risks:blankRisks(),history:[]};
   const overlay=document.querySelector('#overlay');
   overlay.innerHTML=`<div class="drawer-backdrop"><div class="drawer"><div class="topbar"><div><h2>${existing?'Edit':'Add'} ${b.horizon.toUpperCase()} bet</h2><p class="lead">The form asks for only the level of certainty appropriate to this horizon.</p></div><button class="btn" id="closeDrawer">Close</button></div>
   <div class="section"><div class="field"><label>Horizon</label><select id="f_horizon"><option value="later" ${b.horizon==='later'?'selected':''}>Later</option><option value="next" ${b.horizon==='next'?'selected':''}>Next</option><option value="now" ${b.horizon==='now'?'selected':''}>Now</option></select><div class="helper">Changing horizon changes the required information.</div></div></div>
@@ -201,7 +224,7 @@ function closeBet(b){
 }
 
 document.querySelector('#globalAdd').onclick=()=>openEditor(null,'later');
-document.querySelector('#exportBtn').onclick=()=>{ const blob=new Blob([JSON.stringify(bets,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='roadmap-data.json'; a.click(); URL.revokeObjectURL(a.href); };
+document.querySelector('#exportBtn').onclick=()=>{ const exportBets=bets.filter(b=>b.isSample!==true); const blob=new Blob([JSON.stringify(exportBets,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='roadmap-data.json'; a.click(); URL.revokeObjectURL(a.href); };
 document.querySelector('#importBtn').onclick=()=>document.querySelector('#importFile').click();
 document.querySelector('#importFile').addEventListener('change',async e=>{ const f=e.target.files[0]; if(!f) return; try{ const data=JSON.parse(await f.text()); if(!Array.isArray(data)) throw new Error(); bets=data; save(); renderRoadmap(); }catch{ alert('That file is not a valid roadmap export.'); } e.target.value=''; });
 
